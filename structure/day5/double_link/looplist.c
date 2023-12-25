@@ -355,5 +355,5 @@ linklist joseph(linklist head,int n,int m){
 	// 	del=NULL;
 	// 	p=p->next;
 	// }
-	// return p;
+	// return NULL;
 }
