@@ -35,8 +35,22 @@ linklist insert_head(linklist head,datatype element){
 	if(NULL==s)
 		return head;
 	s->data=element;
+
+	if (NULL==head) {
+		head=s;
+		return head;
+	}
+	//找到最后一个节点
+
+	linklist rear=head;
+	while(rear->next!=head){
+		rear=rear->next;
+	}
+	// s的指针域
 	s->next=head;
 	head=s;
+	// 实现单项循环链表
+	rear->next=head;
 	return head;
 }
 
@@ -46,20 +60,23 @@ linklist insert_head(linklist head,datatype element){
  * @param [out] printf linklist
  * @return      void
  */
-void output(linklist list){
-	linklist temp=list;
+void output(linklist head){
+	linklist temp=head;
 	printf("\n\n----------链表---------\n");
 	printf("序号\tdata\tlinklist\n");
 	int i=0;
-	while(temp!=NULL){
+
+	do{
 		printf("%d\t",++i);
 		printf("%d\t",temp->data);
 		printf("%p\n",temp);
 		temp=temp->next;
-	}
+	}while(temp!=head);
+
 	puts("-----------------------");
 	printf("\n\n");
 }
+
 /*
  * function:    尾插
  * @param [ in] 
@@ -205,7 +222,7 @@ linklist delete_pos(linklist list,int pos){
  * function:    位置查找
  * @param [ in] list,pos
  * @param [out] 
- * @return      data
+ * @return      data 0 
  */
 datatype find_pos(linklist list,int pos){
 	if(NULL==list||pos<1||pos>len_linklist(list)){
