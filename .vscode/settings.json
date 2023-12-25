@@ -1,3 +1,9 @@
 {
-    "editor.fontFamily": "JetBrainsMono-Light, Cascadia Mono PL , Consolas , \"微软雅黑\""
+    "editor.fontFamily": "JetBrains Mono ,\"微软雅黑\"",
+    "editor.codeLensFontFamily": "JetBrains Mono NL,\"微软雅黑\"",
+    "editor.inlayHints.fontFamily": "JetBrains Mono NL,\"微软雅黑\"",
+    "scm.inputFontFamily": "Cascadia Code",
+    "terminal.integrated.fontFamily": "Cascadia Code",
+    "editor.mouseWheelZoom": true,
+    "editor.fontLigatures": true
 }

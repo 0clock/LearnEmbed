@@ -99,7 +99,7 @@ void op_Update_pos(){
 	scanf("%d",&element);
 	update_pos(list,pos,element);
 	printf("\n\n");
-}	
+}
 
 void op_Find_pos(){
 	int pos=0;
@@ -107,10 +107,12 @@ void op_Find_pos(){
 	scanf("%d",&pos);	
 	printf("\n\n%d号数据为：%d\n\n",pos,find_pos(list,pos));
 }
+
 void op_Invert(){
 	list=invert(list);
 	printf("\n\n");
 }
+
 int main(int argc, const char *argv[]){
 
 	while(1){

@@ -30,4 +30,5 @@ linklist delete_pos(linklist list,int pos);
 datatype find_pos(linklist list,int pos);
 void update_pos(linklist list,int pos,datatype element);
 linklist invert(linklist list);
+
 #endif
