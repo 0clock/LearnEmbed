@@ -30,5 +30,6 @@ linklist delete_pos(linklist list,int pos);
 datatype find_pos(linklist list,int pos);
 void update_pos(linklist list,int pos,datatype element);
 linklist invert(linklist list);
-
+linklist free_space(linklist head);
+linklist joseph(linklist head,int n,int m);
 #endif

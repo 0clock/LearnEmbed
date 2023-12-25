@@ -20,7 +20,7 @@ linklist creat_node(){
 	if(NULL == p)
 		return NULL;
 	p->data=0;
-	p->next=NULL;
+	p->next=p;
 	return p;
 }
 
@@ -83,24 +83,24 @@ void output(linklist head){
  * @param [out] 
  * @return      
  */
-linklist insert_rear(linklist list,datatype element){
+linklist insert_rear(linklist head,datatype element){
 	linklist p=creat_node();
 	if(NULL==p){
-		return list;
+		return head;
 	}
 	p->data=element;
 
-	if(NULL==list){
-		list=p;
+	if(NULL==head){
+		head=p;
 	}else{
-		linklist temp=list;
-		while(temp->next!=NULL){
+		linklist temp=head;
+		while(temp->next!=head){
 			temp=temp->next;
 		}
-
 		temp->next=p;
+		p->next=head;
 	}
-	return list;
+	return head;
 }
 
 /*
@@ -109,14 +109,28 @@ linklist insert_rear(linklist list,datatype element){
  * @param [out] 
  * @return      
  */
-linklist delete_head(linklist list){
-	if(NULL==list)
-		return list;
-	linklist del=list;
-	list=list->next;
+linklist delete_head(linklist head){
+	if(NULL==head)
+		return head;
+	// 如果存在节点=1
+	if(head==head->next){
+		free(head);
+		head=NULL;
+		return NULL;
+	}
+
+	// 找到最后一个节点,为了删掉头节点时候能找到
+	linklist p = head;
+	while (p->next != head){
+		p=p->next;
+	}
+
+	linklist del=head;
+	head=head->next;
 	free(del);
 	del=NULL;
-	return list;
+	p->next=head;
+	return head;
 }
 
 /*
@@ -125,36 +139,39 @@ linklist delete_head(linklist list){
  * @param [out] 
  * @return      
  */
-linklist delete_rear(linklist list){
-	if(NULL==list)
+linklist delete_rear(linklist head){
+	if(NULL==head)
 		return NULL;
-	if(list->next==NULL){
-		free(list);
-		list=NULL;
-		return list;
-	}else{
-		linklist p=list;
-		while(p->next->next!=NULL){
+	// 只有一个节点
+	if(head->next==head){
+		free(head);
+		head=NULL;
+		return head;
+	}else{//多个节点
+		linklist p=head;
+		while(p->next->next!=head){
 			p=p->next;
 		}
 		free(p->next);
-		p->next=NULL;
+		p->next=head;
 	}
 
-	return list;
+	return head;
 }
+
 /*
  * function:    计算linklist长度
  * @param [ in] 
  * @param [out] 
  * @return      
  */
-int len_linklist(linklist list){
+int len_linklist(linklist head){
 	int count=0;
-	while(list!=NULL){
-		list=list->next;
+	linklist temp=head;
+	do{
+		temp=temp->next;
 		count++;
-	}
+	}while(temp!=head);
 
 	return count;
 }
@@ -230,7 +247,7 @@ datatype find_pos(linklist list,int pos){
 	}
 	linklist p=list;
 	for (int i = 1; i < pos; i++) {
-		p=p->next;
+		p=p-> next;
 	}
 
 	return p->data;
@@ -297,3 +314,46 @@ linklist search_element(linklist list,datatype element){
 			
 }
 
+/*
+ * function:    释放
+ * @param [ in] 
+ * @param [out] 
+ * @return      
+ */
+
+linklist free_space(linklist head){
+	if(NULL==head)
+		return head;
+
+	linklist p=head;
+	while(p!=NULL){
+		p=delete_head(p);
+	}
+	head=NULL;
+	return head;
+}
+
+/*
+ * function:    约瑟夫环
+ * @param [ in
+ * @param [out] 
+ * @return      
+ */
+linklist joseph(linklist head,int n,int m){
+	// if(NULL==head)
+	// 	return head;
+	// linklist p=head;
+
+	// for(int i=0;i<n;i++){
+	// 	for(int j=0;j<m-2;j++){
+	// 		p=p->next;
+	// 	}
+	// 	linklist del=p->next;
+	// 	printf("%d\t",del->data);
+	// 	p->next=del->next;
+	// 	free(del);
+	// 	del=NULL;
+	// 	p=p->next;
+	// }
+	// return p;
+}

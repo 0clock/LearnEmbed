@@ -5,5 +5,8 @@
     "scm.inputFontFamily": "Cascadia Code",
     "terminal.integrated.fontFamily": "Cascadia Code",
     "editor.mouseWheelZoom": true,
-    "editor.fontLigatures": true
+    "editor.fontLigatures": true,
+    "files.associations": {
+        "myhead.h": "c"
+    }
 }

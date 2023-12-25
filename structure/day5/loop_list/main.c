@@ -22,11 +22,13 @@ enum Operate{
 	Update_pos,
 	Find_pos,
 	Invert,
+	Joseph,
+	Free_space,
 	Exit
 };
 char *op_msg[]={"Input","Output","头插","尾插",
 				"头删","尾删","位置插入","位置删除",
-				"位置修改","位置查找","逆置","Exit"};
+				"位置修改","位置查找","逆置","约瑟夫环","释放","Exit"};
 enum Operate op;
 
 int n;
@@ -113,6 +115,12 @@ void op_Invert(){
 	printf("\n\n");
 }
 
+void op_Joseph(){
+	int m;
+	printf("m=");
+	scanf("%d",&m);
+	list=joseph(list,n,m);
+}
 int main(int argc, const char *argv[]){
 
 	while(1){
@@ -171,6 +179,12 @@ int main(int argc, const char *argv[]){
 				break;
 			case Invert:
 				op_Invert();
+				break;
+			case Free_space:
+				free_space(list);
+				break;
+			case Joseph:
+				op_Joseph();
 				break;
 			case Exit:
 				return 0;
