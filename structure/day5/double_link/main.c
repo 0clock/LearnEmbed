@@ -43,7 +43,7 @@ void op_input(){
 		datatype element;
 		printf("请入第%d个节点存储的数据：",i+1);
 		scanf("%d",&element);
-		head=insert _head(head,element);
+		head=insert_head(head,element);
 	}
 	printf("\n\n");
 }
