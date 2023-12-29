@@ -10,7 +10,6 @@
 #include <string.h>
 
 int main(int argc, const char *argv[]){
-
 	FILE *fp=NULL;
 	FILE *fp_cp=NULL;
 	if((fp=fopen("./test.txt","r"))==NULL){
@@ -21,7 +20,6 @@ int main(int argc, const char *argv[]){
 		perror("fopen w:");
 		return -1;
 	}
-
 	char buff=0;
 	int line=0;
 	while((buff=fgetc(fp))!=EOF){
@@ -30,7 +28,5 @@ int main(int argc, const char *argv[]){
 			line++;
 	}
 	printf("文件有%d行。\n",line);
-
-
 	return 0;
 }
