@@ -22,9 +22,13 @@ int main(int argc, const char *argv[]){
 	// fflush(stdout);
 	// while(1);
 	// int num = 0;
-	// printf("请输入num");
-	printf("%ld\n", stdout->_IO_buf_end - stdout->_IO_buf_base);    //未使用时，大小为0
-	printf("%ld\n", stdout->_IO_buf_end - stdout->_IO_buf_base);    //行缓存1024
+	// // printf("请输入num");
+	// printf("%ld\n", stdout->_IO_buf_end - stdout->_IO_buf_base);    //未使用时，大小为0
+	// printf("%ld\n", stdout->_IO_buf_end - stdout->_IO_buf_base);    //行缓存1024
 
+
+	fputs("hello world", stderr);
+	while(1);
+	
 	return 0;
 }
