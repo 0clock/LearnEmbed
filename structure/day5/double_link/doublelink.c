@@ -59,5 +59,4 @@ void output(doublelink head){
 	}
 	doublelink p=head;
 	while(p->next)
-
-} 
+}
