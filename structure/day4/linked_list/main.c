@@ -66,6 +66,7 @@ void op_Delete_head(){
 	list=delete_head(list);
 	printf("\n\n");
 }
+
 void op_Delete_rear(){
 	list=delete_rear(list);
 	printf("\n\n");
