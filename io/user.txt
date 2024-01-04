@@ -1,4 +1,0 @@
-lisi aaaa
-admin admin
-user  ssss
-admin   admin
