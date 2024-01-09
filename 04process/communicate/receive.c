@@ -25,19 +25,19 @@ int main(int argc, const char *argv[])
 	char rbuf[128] = "";
 	while(1)
 	{
-		bzero(rbuf, sizeof(rbuf));           //清空内容
+		// bzero(rbuf, sizeof(rbuf));           //清空内容
  
-		//从管道中读取数据
-		read(rfd, rbuf, sizeof(rbuf));
+		// //从管道中读取数据
+		// read(rfd, rbuf, sizeof(rbuf));
  
-		printf("收到消息：%s\n", rbuf);
+		// printf("收到消息：%s\n", rbuf);
  
 		
-		//判断
-		if(strcmp(rbuf, "quit") == 0)
-		{
-			break;
-		}
+		// //判断
+		// if(strcmp(rbuf, "quit") == 0)
+		// {
+		// 	break;
+		// }
 	}
  
 	//关闭文件

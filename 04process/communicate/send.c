@@ -7,21 +7,18 @@
 #include <sys/stat.h>
 #include <pthread.h>
 #include <string.h>
-
-
+ 
 int main(int argc, const char *argv[])
 {
-	//以只写的形式打开管道文件
-	int wfd = -1;
 	//创建有名管道文件
 	if(mkfifo("./myfifo", 0664) != 0)
 	{
 		perror("mkfifo error");
 		return -1;
 	}
- 
-	printf("myfifo create success\n");
-
+	
+	//以只写的形式打开管道文件
+	int wfd = -1;
 	if((wfd = open("./myfifo", O_WRONLY)) == -1)
 	{
 		perror("open error");
@@ -48,8 +45,6 @@ int main(int argc, const char *argv[])
 		//判断
 		if(strcmp(wbuf, "quit") == 0)
 		{
-			
-			system("rm myfifo");
 			break;
 		}
 	}
