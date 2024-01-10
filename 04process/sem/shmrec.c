@@ -81,7 +81,7 @@ int main(int argc, const char *argv[])
 		return -1;
 	}
  
- 
+
 	//6、删除共享内存
 	if(shmctl(shmid, IPC_RMID, NULL) == -1)
 	{
