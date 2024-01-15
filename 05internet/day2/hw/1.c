@@ -91,7 +91,7 @@ int main(int argc, const char *argv[])
 
     cin.sin_family = AF_INET;
     cin.sin_port = htons(8888);
-    cin.sin_addr.s_addr = inet_addr("192.168.124.19");
+    cin.sin_addr.s_addr = inet_addr("192.168.117.1");
 
     // 连接服务器
     connect(cfd, (struct sockaddr *)&cin, sizeof(cin));
