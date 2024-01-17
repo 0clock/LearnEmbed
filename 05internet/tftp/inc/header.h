@@ -1,11 +1,6 @@
-/*
- * Filename: 02tcpClint.c
- * Author: linus
- * Date: 2024-01-12
- * Version: 1.0
- *
- * Description: The purpose of this code.
- */
+#ifndef _HEADER_H_
+#define _HEADER_H_
+
 
 #include <stdio.h>
 #include <unistd.h>
@@ -25,8 +20,5 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-int main(int argc, const char *argv[])
-{
-    
-    return 0;
-}
+
+#endif

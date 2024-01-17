@@ -100,9 +100,7 @@ int main(int argc, const char *argv[])
 		if(strcmp(buf, "quit") == 0)
 		{
 			break;
-		}
- 
- 
+		} 
 	}
  
 	//5、关闭套接字
