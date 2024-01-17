@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/wait.h>
+// #include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -21,14 +21,12 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
-
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #define SER_PORT 8888                  //服务器端口号
 #define SER_IP  "192.168.117.128"      //服务器客户端
- 
- 
+
 int main(int argc, const char *argv[])
 {
 	//1、创建用于连接的套接字
@@ -123,10 +121,6 @@ int main(int argc, const char *argv[])
 	//6、关闭套接字
 	close(newfd);
 	close(sfd);
- 
- 
- 
- 
  
 	return 0;
 }

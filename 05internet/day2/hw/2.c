@@ -16,9 +16,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <linux/input.h>
 
 #define SER_PORT 8888           // 服务器端口号
-#define SER_IP "192.168.117.128" // 服务器ip地址
+#define SER_IP "192.168.117.1" // 服务器ip地址
 #define CLI_PORT 6666           // 客户端的端口号
 #define CLI_IP "192.168.117.128" // 客户端ip地址
 int cfd;
@@ -58,7 +59,7 @@ int RobArmCtl(char buf[128])
     send_buf[1] = 0x02;
 
     send_buf[4] = 0xff;
-    send(cfd, send_buf, sizeof(send_buf), 0);
+    send(cfd, send_buf, sizeof(send_buf),0);
 }
 
 int init()
@@ -73,15 +74,13 @@ int init()
     send_buf[0] = 0xff;
     send_buf[1] = 0x02;
     send_buf[2] = 0x01;
-    send_buf[3] = 90;
+    send_buf[3] = 0xA6;
     send_buf[4] = 0xff;
-    send(cfd, send_buf, sizeof(send_buf), 0);
+    send(cfd, send_buf, sizeof(send_buf),0);
 }
 
 int main(int argc, const char *argv[])
 {
-    // 1、创建用于通信的套接字文件描述符
-    int cfd = -1;
     cfd = socket(AF_INET, SOCK_STREAM, 0);
     if (cfd == -1)
     {
@@ -117,7 +116,13 @@ int main(int argc, const char *argv[])
         return -1;
     }
     printf("connect success\n");
-    init();
+    // init();
+
+    //4、向服务器发送消息
+	char rbuf[5] = {0xff, 0x02, 0x00, 0xA6, 0xff};   //红色臂
+	unsigned char bbuf[5] = {0xff, 0x02, 0x01, 0x00, 0xff};   //蓝色臂
+ 
+
 
     // 4、收发数据
     char buf[128] = "";
@@ -132,7 +137,7 @@ int main(int argc, const char *argv[])
 
         // 发送给服务器
         RobArmCtl(buf);
-        send(cfd, "Hello", sizeof("Hello"), 0);
+        // send(cfd, "Hello", sizeof("Hello"), 0);
         printf("发送成功\n");
         if (strcmp(buf, "quit") == 0)
         {
