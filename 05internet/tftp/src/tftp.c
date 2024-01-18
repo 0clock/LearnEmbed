@@ -1,6 +1,6 @@
 #include "tftp.h"
 
-int tftp_send()
+int tftp_download()
 {
     // 1、创建用于通信的套接字文件描述符
     int cfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -11,9 +11,12 @@ int tftp_send()
     }
 
     // 输入文件名
+    printf("请输入要拷贝的文件名：");
     char filename[128];
     fgets(filename, sizeof(filename), stdin);
     filename[strlen(filename) - 1] = '\0';
+
+    // 创建文件
     int fd_cp = -1;
     fd_cp = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0664);
 
@@ -42,15 +45,15 @@ int tftp_send()
     char *p3 = p2 + strlen(p2) + 1;
     strcpy(p3, "octet");
     int len = 4 + strlen(p2) + strlen(p3); // 要发送的长度
-
     // 向服务器发送请求
     sendto(cfd, send_buf, len, 0, (struct sockaddr *)&sin, sizeof(sin));
     char rbuf[512] = "";
     int res = 0;
     short *block_count = (short *)(send_buf + 2);
-    int i=1;
+    int i = 1;
     do
     {
+        bzero(rbuf, 512);
         res = recv(cfd, rbuf, sizeof(rbuf), 0);
         if (ntohs(*((short *)rbuf)) == 5)
         {
@@ -58,21 +61,18 @@ int tftp_send()
             printf("[ERROR_CODE]:%d\n", ntohs(*((short *)(rbuf + 2))));
             printf("[ERROR_MSG]:%s\n", rbuf + 4);
         }
-
-        if (ntohs(*((short *)rbuf)) == 3)
+        else if (ntohs(*((short *)rbuf)) == 3)
         {
             write(fd_cp, rbuf + 4, res - 4);
-            // *block_count = *((short *)(rbuf + 2));
-            *block_count = htons(i++);
+            *block_count = *((short *)(rbuf + 2));
+            // *block_count = htons(i++);
             *p1 = htons(4);
             sendto(cfd, send_buf, 4, 0, (struct sockaddr *)&sin, sizeof(sin));
             printf("返回了ACK\n");
         }
-        
         printf("block_count=%d\n", ntohs(*block_count));
-        printf("res=%d\n", res);
-
-    } while (res == 512);
+        printf("res=%d\n\n\n\n", res);
+    } while (1); // res == 512
 
     // //5、关闭套接字
     close(cfd);

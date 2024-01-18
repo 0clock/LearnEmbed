@@ -6,6 +6,6 @@
 #define SER_PORT 69
 #define SER_IP "192.168.117.1"
 
-int tftp_send ();
+int tftp_download ();
 
 #endif

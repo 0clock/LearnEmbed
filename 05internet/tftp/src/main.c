@@ -13,8 +13,8 @@
 
 int main(int argc, const char *argv[])
 {
-	print_menu();
+	// print_menu();
 
-	tftp_send();
+	tftp_download();
 	return 0;
 }
