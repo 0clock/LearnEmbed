@@ -2,6 +2,14 @@
 
 int tftp_download()
 {
+    int log_fp = -1;
+    log_fp = open("./log.txt", O_WRONLY | O_CREAT | O_TRUNC, 0664);
+    if (log_fp == -1)
+    {
+        perror("创建文件失败:");
+        return -1;
+    }
+
     // 1、创建用于通信的套接字文件描述符
     int cfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (cfd == -1)
@@ -34,7 +42,7 @@ int tftp_download()
     sin.sin_addr.s_addr = inet_addr(SER_IP);
 
     // 向服务器发送下载请求
-    char send_buf[512] = "";
+    char send_buf[516] = "";
 
     // 组装请求数据
     short *p1 = (short *)send_buf;
@@ -47,14 +55,17 @@ int tftp_download()
     int len = 4 + strlen(p2) + strlen(p3); // 要发送的长度
     // 向服务器发送请求
     sendto(cfd, send_buf, len, 0, (struct sockaddr *)&sin, sizeof(sin));
-    char rbuf[512] = "";
+    char rbuf[1024] = "";
     int res = 0;
     short *block_count = (short *)(send_buf + 2);
     int i = 1;
-    do
+
+
+    while (1) // res == 512
     {
-        bzero(rbuf, 512);
+        bzero(rbuf, 1024);
         res = recv(cfd, rbuf, sizeof(rbuf), 0);
+        printf("res=%d\n", res);
         if (ntohs(*((short *)rbuf)) == 5)
         {
             printf("休斯顿，我们有麻烦了：\n");
@@ -63,16 +74,15 @@ int tftp_download()
         }
         else if (ntohs(*((short *)rbuf)) == 3)
         {
-            write(fd_cp, rbuf + 4, res - 4);
+            // write(fd_cp, rbuf + 4, res - 4);
             *block_count = *((short *)(rbuf + 2));
             // *block_count = htons(i++);
             *p1 = htons(4);
-            sendto(cfd, send_buf, 4, 0, (struct sockaddr *)&sin, sizeof(sin));
+            sendto(cfd, rbuf, 4, 0, (struct sockaddr *)&sin, sizeof(sin));
             printf("返回了ACK\n");
+            printf("block_count=%d\n", ntohs(*block_count));
         }
-        printf("block_count=%d\n", ntohs(*block_count));
-        printf("res=%d\n\n\n\n", res);
-    } while (1); // res == 512
+    }
 
     // //5、关闭套接字
     close(cfd);
