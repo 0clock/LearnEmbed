@@ -1,5 +1,7 @@
 #include "tftp.h"
 
+int blocksize = DATA_SIZE;
+
 int tftp_download()
 {
     int log_fp = -1;
@@ -58,29 +60,51 @@ int tftp_download()
     char rbuf[1024] = "";
     int res = 0;
     short *block_count = (short *)(send_buf + 2);
-    int i = 1;
 
+    char log_buf[1024] = "";
+
+    short num = 1;
+
+    socklen_t addrlen = sizeof(sin);
 
     while (1) // res == 512
     {
         bzero(rbuf, 1024);
-        res = recv(cfd, rbuf, sizeof(rbuf), 0);
+        res = recvfrom(cfd, rbuf, sizeof(rbuf), 0, (struct sockaddr *)&sin, &addrlen);
         printf("res=%d\n", res);
         if (ntohs(*((short *)rbuf)) == 5)
         {
-            printf("休斯顿，我们有麻烦了：\n");
+            printf("ERROR:\n");
             printf("[ERROR_CODE]:%d\n", ntohs(*((short *)(rbuf + 2))));
             printf("[ERROR_MSG]:%s\n", rbuf + 4);
         }
         else if (ntohs(*((short *)rbuf)) == 3)
         {
+            printf("收到了数据包\n");
             // write(fd_cp, rbuf + 4, res - 4);
-            *block_count = *((short *)(rbuf + 2));
-            // *block_count = htons(i++);
-            *p1 = htons(4);
-            sendto(cfd, rbuf, 4, 0, (struct sockaddr *)&sin, sizeof(sin));
-            printf("返回了ACK\n");
-            printf("block_count=%d\n", ntohs(*block_count));
+            if (num == ntohs(*((short *)(rbuf + 2))))
+            {
+                write(fd_cp, rbuf + 4, res - 4);
+
+                // 返回ACK
+                *p1 = htons(4);
+                *block_count = htons(num);
+                if (sendto(cfd, send_buf, 4, 0, (struct sockaddr *)&sin, sizeof(sin)) < 0)
+                {
+                    perror("sendto error:");
+                    return -1;
+                }
+                write(log_fp, send_buf, 4);
+                printf("返回了ACK\n");
+                printf("block_count=%d\n", ntohs(*block_count));
+                num++;
+            }
+        }
+
+        if (res < 516)
+        {
+            printf("接收结束！\n");
+            break;
         }
     }
 
@@ -88,4 +112,26 @@ int tftp_download()
     close(cfd);
     close(fd_cp);
     return 0;
+}
+
+int tftp_update()
+{
+    struct tftp_packet rcv_packet, snd_packet;
+    // 输入文件名
+    printf("请输入要上传的文件名：");
+    char filename[128];
+    fgets(filename, sizeof(filename), stdin);
+    filename[strlen(filename) - 1] = '\0';
+
+    int fd = -1;
+    fd = open(filename, O_RDONLY);
+    if (fd == -1)
+    {
+        perror("open error");
+        return -1;
+    }
+
+    snd_packet.cmd = htons(CMD_WRQ);
+    sprintf(snd_packet.filename, "%s%c%s%c%d%c", filename, 0, "octet", 0, blocksize, 0);
+    snd_packet.cmd = CMD_WRQ;
 }

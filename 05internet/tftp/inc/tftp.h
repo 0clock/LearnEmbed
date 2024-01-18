@@ -14,8 +14,28 @@
 #define CMD_LIST (short)6
 #define CMD_HEAD (short)7
 
+#define DATA_SIZE 512
 
+struct tftp_packet
+{
+    __u_short cmd;
+    union
+    {
+        __u_short code;
+        __u_short block;
+        // For a RRQ and WRQ TFTP packet
+        char filename[2];
+    };
+    char data[DATA_SIZE];
+};
 
-int tftp_download ();
+struct tftp_request
+{
+    int size;
+    struct sockaddr_in client;
+    struct tftp_packet packet;
+};
+
+int tftp_download();
 
 #endif
