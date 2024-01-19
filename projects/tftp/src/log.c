@@ -4,5 +4,5 @@ char *hextochar(){}
 
 void log_write(int fd,char* buf)
 {
-;
+    ;
 }

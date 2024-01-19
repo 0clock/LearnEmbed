@@ -139,6 +139,7 @@ int tftp_update()
         return -1;
     }
 
+    //填充上传请求数据
     snd_packet.cmd = htons(CMD_WRQ);
     sprintf(snd_packet.filename, "%s%c%s%c%d%c", filename, 0, "octet", 0, blocksize, 0);
     // 2、绑定（可选）
