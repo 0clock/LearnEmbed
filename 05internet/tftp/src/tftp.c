@@ -131,7 +131,29 @@ int tftp_update()
         return -1;
     }
 
+    // 1、创建用于通信的套接字文件描述符
+    int cfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (cfd == -1)
+    {
+        perror("socket error");
+        return -1;
+    }
+
     snd_packet.cmd = htons(CMD_WRQ);
     sprintf(snd_packet.filename, "%s%c%s%c%d%c", filename, 0, "octet", 0, blocksize, 0);
-    snd_packet.cmd = CMD_WRQ;
+    // 2、绑定（可选）
+    // 3、填充服务器的地址信息结构体
+    struct sockaddr_in sin;
+    sin.sin_family = AF_INET;
+    sin.sin_port = htons(SER_PORT);
+    sin.sin_addr.s_addr = inet_addr(SER_IP);
+    socklen_t addrlen = sizeof(sin);
+    sendto(cfd, &snd_packet, sizeof(struct tftp_packet), 0, (struct sockaddr *)&sin, addrlen);
+
+    while (1)
+    {
+        
+    }
+    
+
 }

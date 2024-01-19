@@ -15,6 +15,9 @@ int main(int argc, const char *argv[])
 {
 	// print_menu();
 
-	tftp_download();
+	// tftp_download();
+	tftp_update();
+	
+
 	return 0;
 }

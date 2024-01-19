@@ -37,5 +37,6 @@ struct tftp_request
 };
 
 int tftp_download();
+int tftp_update();
 
 #endif
