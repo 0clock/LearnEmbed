@@ -1,31 +1,40 @@
-EXE = chat
-SRC_DIR = src
-INC_DIR = inc
-OBJ_DIR = obj
+# Makefile for the chat project
 
-SRCS = $(wildcard $(SRC_DIR)/*.c)
-OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
-
+# Compiler and flags
 CC = gcc
-CFLAGS = -c -o
+CFLAGS = -Wall -Werror
+
+
+# Directories
+INC_DIR = inc
+SERVER_DIR = server
+CLIENT_DIR = client
 INC_FLAGS = -I$(INC_DIR)
 
-all: $(EXE)
+# Source files
+SERVER_SRC = $(wildcard $(SERVER_DIR)/*.c)
+CLIENT_SRC = $(wildcard $(CLIENT_DIR)/*.c)
 
-$(EXE): $(OBJS)
-	$(CC) $^ -o $@
+# Object files
+SERVER_OBJ = $(patsubst $(SERVER_DIR)/%.c, $(SERVER_DIR)/%.o, $(SERVER_SRC))
+CLIENT_OBJ = $(patsubst $(CLIENT_DIR)/%.c, $(CLIENT_DIR)/%.o, $(CLIENT_SRC))
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $@ $< $(INC_FLAGS)
+# Targets
+all: server client
 
-.PHONY: clean
+server: $(SERVER_OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
+
+client: $(CLIENT_OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
+
+# Compile source files
+$(SERVER_DIR)/%.o: $(SERVER_DIR)/%.c $(INC_DIR)/common.h
+	$(CC) $(CFLAGS) $(INC_FLAGS) -c -o $@ $<
+
+$(CLIENT_DIR)/%.o: $(CLIENT_DIR)/%.c $(INC_DIR)/common.h
+	$(CC) $(CFLAGS) $(INC_FLAGS) -c -o $@ $<
+
+# Clean rule
 clean:
-	rm -rf $(OBJ_DIR) $(EXE)
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $@ $< $(INC_FLAGS)
-
-$(OBJS): | $(OBJ_DIR)
-
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+	rm -f $(SERVER_DIR)/*.o $(CLIENT_DIR)/*.o server client

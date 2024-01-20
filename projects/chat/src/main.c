@@ -8,10 +8,11 @@
  */
 
 #include "header.h"
+#include "loger.h"
 
 int main(int argc, const char *argv[])
 {
 
-
+	loger("hello world");
 	return 0;
 }

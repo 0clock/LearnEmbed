@@ -3,5 +3,6 @@
 
 #include "header.h"
 
-void log(char *buf);
+void loger(char *buf);
+
 #endif

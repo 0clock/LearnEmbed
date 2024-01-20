@@ -14,7 +14,7 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/types.h>
-#include <sys/ipc.h>
+#include <sys/ipc.h> 
 #include <sys/msg.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
