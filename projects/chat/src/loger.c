@@ -3,7 +3,6 @@
 
 time_t sys_time;
 
-char *hextochar() {}
 
 void loger(char *buf)
 {

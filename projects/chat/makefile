@@ -1,40 +1,67 @@
-# Makefile for the chat project
+# Makefile
 
-# Compiler and flags
+# 编译器
 CC = gcc
+
+# 编译选项
 CFLAGS = -Wall -Werror
 
+# 目标文件夹
+BUILD_DIR = build
 
-# Directories
+# 源文件夹
+SRC_DIR = src
 INC_DIR = inc
 SERVER_DIR = server
 CLIENT_DIR = client
-INC_FLAGS = -I$(INC_DIR)
 
-# Source files
-SERVER_SRC = $(wildcard $(SERVER_DIR)/*.c)
-CLIENT_SRC = $(wildcard $(CLIENT_DIR)/*.c)
+# 服务器和客户端的可执行文件名
+SERVER_EXE = $(BUILD_DIR)/server
+CLIENT_EXE = $(BUILD_DIR)/client
 
-# Object files
-SERVER_OBJ = $(patsubst $(SERVER_DIR)/%.c, $(SERVER_DIR)/%.o, $(SERVER_SRC))
-CLIENT_OBJ = $(patsubst $(CLIENT_DIR)/%.c, $(CLIENT_DIR)/%.o, $(CLIENT_SRC))
+# 共享的源文件
+COMMON_SRC = $(wildcard $(SRC_DIR)/*.c)
 
-# Targets
+# 服务器和客户端的源文件
+SERVER_SRC = $(SERVER_DIR)/server.c
+CLIENT_SRC = $(CLIENT_DIR)/client.c
+
+# 服务器和客户端的目标文件
+SERVER_OBJ = $(BUILD_DIR)/server.o
+CLIENT_OBJ = $(BUILD_DIR)/client.o
+COMMON_OBJ = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(COMMON_SRC))
+
+# 创建 build 目录
+$(shell mkdir -p $(BUILD_DIR))
+
+# 所有的目标
 all: server client
 
-server: $(SERVER_OBJ)
+# 服务器目标
+server: $(SERVER_EXE)
+
+$(SERVER_EXE): $(SERVER_OBJ) $(COMMON_OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
-client: $(CLIENT_OBJ)
+$(SERVER_OBJ): $(SERVER_SRC)
+	$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
+
+# 客户端目标
+client: $(CLIENT_EXE)
+
+$(CLIENT_EXE): $(CLIENT_OBJ) $(COMMON_OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
-# Compile source files
-$(SERVER_DIR)/%.o: $(SERVER_DIR)/%.c $(INC_DIR)/common.h
-	$(CC) $(CFLAGS) $(INC_FLAGS) -c -o $@ $<
+$(CLIENT_OBJ): $(CLIENT_SRC)
+	$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
 
-$(CLIENT_DIR)/%.o: $(CLIENT_DIR)/%.c $(INC_DIR)/common.h
-	$(CC) $(CFLAGS) $(INC_FLAGS) -c -o $@ $<
+# 公共源文件目标
+$(COMMON_OBJ): $(COMMON_SRC)
+	$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
 
-# Clean rule
+# 清理目标
 clean:
-	rm -f $(SERVER_DIR)/*.o $(CLIENT_DIR)/*.o server client
+	rm -rf $(BUILD_DIR)/*.o $(SERVER_EXE) $(CLIENT_EXE)
+
+# 伪目标，防止与文件名冲突
+.PHONY: all server client clean
