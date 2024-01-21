@@ -24,6 +24,5 @@ void loger(char *buf)
     {
         perror("fwrite error");
     }
-
     fclose(logfd);
 }

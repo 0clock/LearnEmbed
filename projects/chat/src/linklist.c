@@ -11,7 +11,7 @@
 
 /*
  * function:    链表的创建
- * @param [ in
+ * @param [ in]
  * @param [out]
  * @return
  */
@@ -27,7 +27,7 @@ linklist creat_node()
 
 /*
  * function:    链表的头插
- * @param [ in
+ * @param [ in]
  * @param [out]
  * @return
  */

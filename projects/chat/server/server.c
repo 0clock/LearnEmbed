@@ -60,7 +60,7 @@ int main(int argc, const char *argv[])
 
     int maxfd = sfd;
 
-    // user user;
+    user user;
 
     struct sockaddr_in cin_arr[1024];
 

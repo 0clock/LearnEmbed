@@ -56,7 +56,7 @@ $(CLIENT_OBJ): $(CLIENT_SRC)
 	$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
 
 # 公共源文件目标
-$(COMMON_OBJ): $(COMMON_SRC)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
 
 # 清理目标
