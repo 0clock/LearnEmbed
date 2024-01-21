@@ -1,17 +1,28 @@
 #include "p_thread.h"
+#include "my_udp.h"
 
 
 pthread_t tid1, tid2;
 
+
+// 接收消息，并将判断消息类型，做出不同操作
 void *ser_receive(void *arg)
 {
-    printf("hi");
+    while(1)
+    {
+        server_recv();
+
+    }
     return 0;
 }
 
+// 键盘发送给所有用户
 void *ser_send(void *arg)
 {
-    printf("hi");
+    while(1)
+    {
+
+    }
     return 0;
 }
 
