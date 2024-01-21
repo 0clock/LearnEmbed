@@ -5,5 +5,5 @@
 extern pthread_t tid1, tid2;
 
 int thread_init();
-
+int client_thread_init();
 #endif

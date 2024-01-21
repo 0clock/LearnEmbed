@@ -14,9 +14,6 @@ int main(int argc, const char *argv[])
     udp_init();
 
     thread_init();
-    while (1)
-    {
-        ;
-    }
+    while (1);
     
 }

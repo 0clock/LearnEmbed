@@ -3,6 +3,7 @@
 // 服务器端用于通信的套接字，全局变量
 struct sockaddr_in server_sin, client_cin;
 struct msg_t *user_msg;
+socklen_t socklen = sizeof(client_cin);
 
 enum msg_type_t msg_type;
 
@@ -39,11 +40,37 @@ int udp_init()
     return sfd;
 }
 
+// 将消息转发给其他用户
+int send_usermsg_to_other(user userinfo, struct msg_t *user_msg, linklist userlist)
+{
+    linklist temp = userlist;
+    while (temp != NULL)
+    {
+
+        if (0 != (strcmp(user_msg->username, temp->data.username)))
+        {
+            sendto(sfd, user_msg, sizeof(struct msg_t), 0, (struct sockaddr *)&temp->data.cin, sizeof(temp->data.cin));
+        }
+        temp = temp->next;
+    }
+    return 0;
+}
+
+// 将消息转发给其他用户
+int send_broadcast(struct msg_t *broadcas, linklist userlist)
+{
+    linklist temp = userlist;
+    while (temp != NULL)
+    {
+        sendto(sfd, broadcas, sizeof(struct msg_t), 0, (struct sockaddr *)&temp->data.cin, sizeof(temp->data.cin));
+        temp = temp->next;
+    }
+    return 0;
+}
+
 // 监听
 int server_recv()
 {
-    socklen_t socklen = sizeof(client_cin);
-
     // bzero(user_msg, sizeof(struct msg_t));
 
     recvfrom(sfd, (struct msg_t *)user_msg, 1024, 0, (struct sockaddr *)&client_cin, &socklen);
@@ -51,15 +78,43 @@ int server_recv()
     switch (user_msg->type)
     {
     case LOGIN:
-        strcpy(userinfo.username, user_msg->msg);
+        strcpy(userinfo.username, user_msg->username);
         userinfo.cin = client_cin;
         userlist = insert_head(userlist, userinfo);
-        printf("[%s:%d]%s上线。\n", inet_ntoa(client_cin.sin_addr), ntohs(client_cin.sin_port), user_msg->msg);
+
+        printf("\033[1A"); // 光标上移一行
+        printf("\033[K");  // 清除光标所在行
+        printf("[%s:%d]%s上线。\n", inet_ntoa(userinfo.cin.sin_addr), ntohs(userinfo.cin.sin_port), userinfo.username);
+
+        printf(">>>");
         break;
     case CHAT:
-        
+        strcpy(userinfo.username, user_msg->username);
+        userinfo.cin = client_cin;
+        send_usermsg_to_other(userinfo, user_msg, userlist);
+        user_msg->type = QUIT;
+        break;
+    case QUIT:
+        strcpy(userinfo.username, user_msg->username);
+        userinfo.cin = client_cin;
+        userlist = insert_head(userlist, userinfo);
+        printf("\033[1A"); // 光标上移一行
+        printf("\033[K");  // 清除光标所在行
+        printf("[%s:%d]%s下线。\n", inet_ntoa(userinfo.cin.sin_addr), ntohs(userinfo.cin.sin_port), userinfo.username);
+        printf(">>>");
+        break;
     default:
         break;
     }
+    return 0;
+}
+
+int server_send()
+{
+    struct msg_t * broadcas=(struct msg_t *)malloc(sizeof(struct msg_t));
+    broadcas->type = BOCST;
+    strcpy(broadcas->username, "ADMIN");
+    scanf("%s", broadcas->msg);
+    send_broadcast(broadcas, userlist);
     return 0;
 }
