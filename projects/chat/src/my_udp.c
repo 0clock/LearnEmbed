@@ -81,12 +81,7 @@ int server_recv()
         strcpy(userinfo.username, user_msg->username);
         userinfo.cin = client_cin;
         userlist = insert_head(userlist, userinfo);
-
-        printf("\033[1A"); // 光标上移一行
-        printf("\033[K");  // 清除光标所在行
         printf("[%s:%d]%s上线。\n", inet_ntoa(userinfo.cin.sin_addr), ntohs(userinfo.cin.sin_port), userinfo.username);
-
-        printf(">>>");
         break;
     case CHAT:
         strcpy(userinfo.username, user_msg->username);
@@ -98,10 +93,7 @@ int server_recv()
         strcpy(userinfo.username, user_msg->username);
         userinfo.cin = client_cin;
         userlist = insert_head(userlist, userinfo);
-        printf("\033[1A"); // 光标上移一行
-        printf("\033[K");  // 清除光标所在行
         printf("[%s:%d]%s下线。\n", inet_ntoa(userinfo.cin.sin_addr), ntohs(userinfo.cin.sin_port), userinfo.username);
-        printf(">>>");
         break;
     default:
         break;
