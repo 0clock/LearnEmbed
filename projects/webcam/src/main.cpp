@@ -11,8 +11,26 @@
 #define WIDTH 640
 #define HEIGHT 480
 #define BUFFER_SIZE WIDTH * HEIGHT * 3 // RGB图像数据大小
+#define FRAM_SIZE WIDTH * HEIGHT * 3 // RGB图像数据大小
+#define PACKET_SIZE 1024 // 每个数据包的大小
 
 using namespace cv;
+
+enum MsgState{
+    Firstpak,
+    
+    LasePak
+};
+
+typedef struct MagPack_T{
+    MsgState state;
+    char Data[]
+} MsgPack;
+
+int SendFram(const struct sockaddr * cfd,socklen_t client_len)
+{
+
+}
 
 int main() {
     // 初始化摄像头
@@ -23,31 +41,21 @@ int main() {
     }
 
     // 创建服务器套接字
-    int server_fd, client_fd;
+    int server_fd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
 
-    // 创建 TCP 套接字
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+    // 创建 UDP 套接字
+    if ((server_fd = socket(AF_INET, SOCK_DGRAM, 0)) == 0) {
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
     
-    //将端口号快速重用函数
-	int reuse = 1;
-	if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1)
-	{
-		perror("setsockopt error");
-		return -1;
-	}
-	printf("端口号快速重用成功\n");
-
-
+    // 设置服务器地址结构
+    memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(PORT);
-
-    
 
     // 绑定套接字到端口
     if (bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
@@ -55,49 +63,46 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    // 开始监听连接
-    if (listen(server_fd, 1) < 0) {
-        perror("listen");
-        exit(EXIT_FAILURE);
-    }
-
     printf("Waiting for incoming connections...\n");
-
-    // 接受连接请求
-    if ((client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_len)) < 0) {
-        perror("accept");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Client connected: %s\n", inet_ntoa(client_addr.sin_addr));
 
     // 缓冲区用于存储图像数据
     uchar buffer[BUFFER_SIZE];
 
+    char buf[4] = {0x00,0x00,0x99};
+    
+    recvfrom(server_fd, buf, sizeof(buf), 0, (struct sockaddr*)&client_addr, &client_len);
+
     // 主循环，持续发送图像数据
     while (1) {
+        recvfrom(server_fd, buf, sizeof(buf), 0, (struct sockaddr*)&client_addr, &client_len);
         Mat frame;
         cap >> frame; // 从摄像头读取图像数据
 
         // 调整图像大小以适应传输
         resize(frame, frame, Size(WIDTH, HEIGHT));
+        
+        sendto(server_fd, buf, sizeof(buf), 0, (struct sockaddr *)&client_addr, client_len);
 
-        // 将图像数据转换为字节流
-        memcpy(buffer, frame.data, BUFFER_SIZE);
+        // 将图像数据分割成数据包并发送给客户端
+        int total_packets = (BUFFER_SIZE + PACKET_SIZE - 1) / PACKET_SIZE; // 计算总的数据包数
+        for (int i = 0; i < total_packets; ++i) {
+            int offset = i * PACKET_SIZE;
+            int packet_size = std::min(BUFFER_SIZE - offset, PACKET_SIZE);
+            memcpy(buffer, frame.data + offset, packet_size);
 
-        // 发送图像数据给客户端
-        if (send(client_fd, buffer, BUFFER_SIZE, 0) != BUFFER_SIZE) {
-            perror("send failed");
-            break;
+            // 发送图像数据给客户端
+            ssize_t bytes_sent = sendto(server_fd, buffer, packet_size, 0, (struct sockaddr *)&client_addr, client_len);
+            if (bytes_sent != packet_size) {
+                perror("sendto failed");
+                break;
+            }
+            printf("send success: packet %d/%d\n", i + 1, total_packets);
+
+            // 为了控制帧率，添加适当的延迟
+            usleep(100); // 10 毫秒
         }
-        printf("send success\n");
-
-        // 为了控制帧率，添加适当的延迟
-        usleep(100000); // 1000 毫秒
     }
-
-    // 关闭连接
-    close(client_fd);
+    // 关闭套接字
     close(server_fd);
 
     return 0;

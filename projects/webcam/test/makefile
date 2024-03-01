@@ -2,7 +2,7 @@ CC = g++
 # 可运行文件
 TARGET = test
 # C文件
-SRCS = test06.cpp
+SRCS = test07.cpp
 # 目标文件
 OBJS = $(SRCS:.cpp=.o)
 # 库文件

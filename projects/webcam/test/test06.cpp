@@ -17,6 +17,13 @@ int main() {
     // 设置摄像头分辨率
     cap.set(CAP_PROP_FRAME_WIDTH, 640);
     cap.set(CAP_PROP_FRAME_HEIGHT, 480);
+
+        // 检查参数是否被正确设置
+    double width = cap.get(CAP_PROP_FRAME_WIDTH);
+    double height = cap.get(CAP_PROP_FRAME_HEIGHT);
+    double fps = cap.get(CAP_PROP_FPS);
+    std::cout << "Frame width: " << width << ", Frame height: " << height << ", FPS: " << fps << std::endl;
+
     
     // 创建窗口
     namedWindow("Camera", WINDOW_NORMAL);
