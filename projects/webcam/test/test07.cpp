@@ -6,6 +6,12 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <opencv2/opencv.hpp>
+#include <ctime>
+
+#include <opencv2/objdetect.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/face.hpp>
+
 
 #define PORT 8888
 #define WIDTH 640
@@ -56,6 +62,43 @@ typedef struct MagPack_T
 // ;
 // }
 
+void addTimestampWatermark(Mat& image) {
+    // 获取当前时间
+    time_t rawTime;
+    struct tm* timeInfo;
+    char buffer[80];
+    time(&rawTime);
+    timeInfo = localtime(&rawTime);
+    strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", timeInfo);
+    std::string timestamp(buffer);
+
+    // 在图像上添加时间水印
+    int fontFace = FONT_HERSHEY_SIMPLEX;
+    double fontScale = 1.5;
+    int thickness = 2.2;
+    int baseline = 0;
+    Size textSize = getTextSize(timestamp, fontFace, fontScale, thickness, &baseline);
+    Point textOrg(image.cols - textSize.width - 10, image.rows - 10);
+    putText(image, timestamp, textOrg, fontFace, fontScale, Scalar(255, 255, 255), thickness);
+}
+
+// 函数用于在帧中检测人脸
+void detectFaces(cv::Mat& frame, cv::CascadeClassifier& faceCascade) {
+    std::vector<cv::Rect> faces;
+    cv::Mat grayFrame;
+
+    // 将帧转换为灰度图
+    cv::cvtColor(frame, grayFrame, cv::COLOR_BGR2GRAY);
+
+    // 在灰度帧中检测人脸
+    faceCascade.detectMultiScale(grayFrame, faces, 1.1, 4);
+
+    // 在检测到的人脸周围绘制矩形框
+    for (const auto& face : faces) {
+        cv::rectangle(frame, face, cv::Scalar(0, 255, 0), 2);
+    }
+}
+
 int main()
 {
     // 初始化摄像头
@@ -67,15 +110,24 @@ int main()
     }
 
     // 设置摄像头参数
-    cap.set(CAP_PROP_FRAME_WIDTH, 1920);  // 设置帧宽度
-    cap.set(CAP_PROP_FRAME_HEIGHT, 1080); // 设置帧高度
-    cap.set(CAP_PROP_FPS, 5);             // 设置帧率
+    // cap.set(cv::CAP_PROP_BACKEND, cv::CAP_V4L);
+    cap.set(CAP_PROP_FRAME_WIDTH, 640);  // 设置帧宽度
+    cap.set(CAP_PROP_FRAME_HEIGHT, 480); // 设置帧高度
+    cap.set(CAP_PROP_FPS, 30);             // 设置帧率
 
     // 检查参数是否被正确设置
     double width = cap.get(CAP_PROP_FRAME_WIDTH);
     double height = cap.get(CAP_PROP_FRAME_HEIGHT);
     double fps = cap.get(CAP_PROP_FPS);
     std::cout << "Frame width: " << width << ", Frame height: " << height << ", FPS: " << fps << std::endl;
+
+
+    // 初始化人脸级联分类器
+    CascadeClassifier faceCascade;
+    if (!faceCascade.load(samples::findFile("./haarcascade_frontalface_alt2.xml"))) {
+        fprintf(stderr, "错误：无法加载人脸级联分类器。\n");
+        return -1;
+    }
 
     // 创建服务器套接字
     int server_fd;
@@ -120,19 +172,25 @@ int main()
 
     // 主循环，持续发送图像数据
     Mat frame;
+    int count = 0;
     while (1)
     {
-
-        recvfrom(server_fd, buf, sizeof(buf), 0, (struct sockaddr *)&client_addr, &client_len);
+        count ++;
+        // recvfrom(server_fd, buf, sizeof(buf), 0, (struct sockaddr *)&client_addr, &client_len);
 
         cap >> frame; // 从摄像头读取图像数据
 
+        // 在帧中检测人脸
+        // detectFaces(frame, faceCascade);//比较卡
+
+        addTimestampWatermark(frame);
         // 调整图像大小以适应传输
         resize(frame, frame, Size(WIDTH, HEIGHT));
 
         vector<uchar> jpeg_buffer;
 
         imencode(".jpg", frame, jpeg_buffer, params);
+        
         //保存成jpg文件，可行
         if (0)
         {
@@ -153,8 +211,8 @@ int main()
                     perror("sendto failed");
                     break;
                 }
-                printf("send success,size=%ld\n",jpeg_buffer.size());
-            usleep(50000); // 50毫秒
+                // printf("send success,size=%ld\n",jpeg_buffer.size());
+            // usleep(50000); // 50毫秒
         }
         //发送原始数据，太慢了，且卡
         if (0)

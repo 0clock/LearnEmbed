@@ -1,12 +1,12 @@
 CC = g++
 # 可运行文件
-TARGET = test
+TARGET = test08
 # C文件
-SRCS = test07.cpp
+SRCS = test08.cpp
 # 目标文件
 OBJS = $(SRCS:.cpp=.o)
 # 库文件
-DLIBS = -lopencv_core -lopencv_videoio -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs
+DLIBS = -lopencv_core -lopencv_videoio -lopencv_imgproc -lopencv_objdetect -lopencv_highgui -lopencv_imgcodecs
 # 链接为可运行文件
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $^ $(DLIBS)

@@ -2,7 +2,7 @@ CC = g++
 # 可运行文件
 TARGET = webcam
 # C文件
-SRCS = main.cpp
+SRCS = main.cpp camera.cpp
 # 目标文件
 OBJS = $(SRCS:.cpp=.o)
 # 库文件
