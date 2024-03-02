@@ -19,20 +19,21 @@
 using namespace cv;
 using namespace std;
 
-class Camera
-{
 #define WIDTH 640
 #define HEIGHT 480
 #define BUFFER_COUNT 4
 #define IMAGE_QUALITY 80 // JPEG压缩质量
+class CameraImageProcess
+{
+
 public:
-    Camera();
-    ~Camera();
+    CameraImageProcess();
     int cam_init();
     int get_fram();
     void addTimestampWatermark(Mat &image);
+    void save_image();
 
-    vector<uchar> jpeg_buffer; // 图像数据
+    vector<uchar> *jpeg_buffer; // 处理完可以发送的图像数据
 
 private:
     int fd;                 // 操作相机的句柄

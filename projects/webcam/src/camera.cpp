@@ -1,28 +1,13 @@
 #include "camera.hpp"
 
-Camera::Camera()
+CameraImageProcess::CameraImageProcess()
 {
+    jpeg_buffer = new vector<uchar>;
 }
 
-Camera::~Camera()
+int CameraImageProcess::cam_init()
 {
-    // 停止捕捉并清理资源
-    type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if (ioctl(fd, VIDIOC_STREAMOFF, &type) == -1) {
-        perror("ioctl");
-    }
-
-    for (int i = 0; i < req.count; ++i) {
-        munmap(buffers[i].start, buffers[i].length);
-    }
-    free(buffers);
-
-    close(fd);
-}
-
-int Camera::cam_init()
-{
-    struct v4l2_format fmt;         // V4L2 格式结构体，用于设置视频格式
+    struct v4l2_format fmt; // V4L2 格式结构体，用于设置视频格式
 
     // 打开摄像头设备
     fd = open("/dev/video0", O_RDWR);
@@ -99,9 +84,12 @@ int Camera::cam_init()
 
     params.push_back(cv::IMWRITE_JPEG_QUALITY);
     params.push_back(IMAGE_QUALITY);
+    cout << "摄像头初始化完成" << endl;
+
+    return 0;
 }
 
-int Camera::get_fram()
+int CameraImageProcess::get_fram()
 {
     Mat frame;
     // 从摄像头中取出帧
@@ -121,16 +109,17 @@ int Camera::get_fram()
 
     addTimestampWatermark(frame);
 
-    imencode(".jpg", frame, jpeg_buffer, params);
+    imencode(".jpg", frame, *jpeg_buffer, params);
     // 将帧重新放入缓冲区队列
     if (ioctl(fd, VIDIOC_QBUF, &buf) == -1)
     {
         perror("ioctl");
         return -1;
     }
+    return 0;
 }
 
-void Camera::addTimestampWatermark(Mat &image)
+void CameraImageProcess::addTimestampWatermark(Mat &image)
 {
     // 获取当前时间
     time_t rawTime;
@@ -149,4 +138,16 @@ void Camera::addTimestampWatermark(Mat &image)
     Size textSize = getTextSize(timestamp, fontFace, fontScale, thickness, &baseline);
     Point textOrg(image.cols - textSize.width - 10, image.rows - 10);
     putText(image, timestamp, textOrg, fontFace, fontScale, Scalar(255, 255, 255), thickness);
+}
+
+void CameraImageProcess::save_image()
+{
+    FILE *fp = fopen("./new.jpg", "w");
+    if (NULL == fp) // 说明文件打开失败
+    {
+        printf("open file error\n");
+        return;
+    }
+    fwrite(jpeg_buffer->data(), jpeg_buffer->size(), 1, fp);
+    fclose(fp);
 }
