@@ -22,7 +22,7 @@ int NetWork::init()
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
-    printf("Waiting for incoming connections...\n");
+    printf("网络初始化完成\n");
 
     return 0;
 }
